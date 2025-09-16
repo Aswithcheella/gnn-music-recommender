@@ -1,0 +1,10 @@
+pandas
+tqdm
+scikit-learn
+networkx
+matplotlib
+boto3
+fastapi
+uvicorn[standard]
+torch
+torch_geometric
