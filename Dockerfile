@@ -1,5 +1,5 @@
 # Stage 1: Builder - This stage installs all dependencies
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -28,4 +28,5 @@ COPY ./src ./src
 COPY app.py .
 
 EXPOSE 8000
-CMD ["uvicorn", "app:py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
