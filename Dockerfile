@@ -3,11 +3,11 @@ FROM python:3.11-slim as builder
 
 WORKDIR /app
 
-# Install PyTorch and PyG first, as they have specific dependencies
+# Install PyTorch and PyG first
 RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 RUN pip install torch_geometric
 
-# Copy the requirements file and install the rest of the packages
+# Install the rest of the packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,20 +17,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy the installed packages (libraries) from the builder stage
+# Copy installed packages and executables
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-
-# --- THIS IS THE FIX ---
-# Copy the executables (like uvicorn) from the builder stage
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy your application code and artifacts
+# Copy your application code
 COPY ./src ./src
-COPY ./artifacts ./artifacts
+# --- REMOVED: No longer copying artifacts at build time ---
+# COPY ./artifacts ./artifacts 
 COPY app.py .
 
-# Expose the port the app runs on
 EXPOSE 8000
-
-# The command to run when the container starts
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:py", "--host", "0.0.0.0", "--port", "8000"]
