@@ -31,11 +31,14 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }} # Use the commit hash as a unique image tag
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }} # Uses the repository name secret
+          IMAGE_TAG: ${{ github.sha }} 
         run: |
-          docker build -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          # --- THIS IS THE FIX ---
+          # The format is now <registry>/<repository>:<tag>
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Download existing task definition
         run: |
@@ -56,3 +59,4 @@ jobs:
           service: ${{ secrets.ECS_SERVICE_NAME }}
           cluster: ${{ secrets.ECS_CLUSTER_NAME }}
           wait-for-service-stability: true
+
